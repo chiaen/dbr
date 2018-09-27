@@ -14,7 +14,8 @@ type SelectStmt struct {
 
 	raw
 
-	IsDistinct bool
+	IsDistinct  bool
+	IsForUpdate bool
 
 	Column    []interface{}
 	Table     interface{}
@@ -131,6 +132,11 @@ func (b *SelectStmt) Build(d Dialect, buf Buffer) error {
 		buf.WriteString(" OFFSET ")
 		buf.WriteString(strconv.FormatInt(b.OffsetCount, 10))
 	}
+
+	if b.IsForUpdate {
+		buf.WriteString(" FOR UPDATE")
+	}
+
 	return nil
 }
 
@@ -208,6 +214,11 @@ func (b *SelectStmt) From(table interface{}) *SelectStmt {
 
 func (b *SelectStmt) Distinct() *SelectStmt {
 	b.IsDistinct = true
+	return b
+}
+
+func (b *SelectStmt) ForUpdate() *SelectStmt {
+	b.IsForUpdate = true
 	return b
 }
 
