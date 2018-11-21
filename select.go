@@ -16,6 +16,7 @@ type SelectStmt struct {
 
 	IsDistinct  bool
 	IsForUpdate bool
+	IsForShare  bool
 
 	Column    []interface{}
 	Table     interface{}
@@ -137,6 +138,10 @@ func (b *SelectStmt) Build(d Dialect, buf Buffer) error {
 		buf.WriteString(" FOR UPDATE")
 	}
 
+	if b.IsForShare {
+		buf.WriteString(" LOCK IN SHARE MODE")
+	}
+
 	return nil
 }
 
@@ -219,6 +224,11 @@ func (b *SelectStmt) Distinct() *SelectStmt {
 
 func (b *SelectStmt) ForUpdate() *SelectStmt {
 	b.IsForUpdate = true
+	return b
+}
+
+func (b *SelectStmt) ForShare() *SelectStmt {
+	b.IsForShare = true
 	return b
 }
 
